@@ -175,7 +175,7 @@ public interface MessageChannel extends ISnowflake, Formattable
      *         If this is a {@link net.dv8tion.jda.core.entities.PrivateChannel PrivateChannel}
      *         and both the currently logged in account and the target user are bots.
      *
-     * @return {@link net.dv8tion.jda.core.requests.RestAction RestAction} - Type: {@link net.dv8tion.jda.core.entities.Message Message}
+     * @return {@link net.dv8tion.jda.core.requests.restaction.MessageAction MessageAction}
      *         <br>The newly created Message after it has been sent to Discord.
      *
      * @see net.dv8tion.jda.core.MessageBuilder
@@ -224,7 +224,7 @@ public interface MessageChannel extends ISnowflake, Formattable
      *         If this is a {@link net.dv8tion.jda.core.entities.PrivateChannel PrivateChannel}
      *         and both the currently logged in account and the target user are bots.
      *
-     * @return {@link net.dv8tion.jda.core.requests.RestAction RestAction} - Type: {@link net.dv8tion.jda.core.entities.Message Message}
+     * @return {@link net.dv8tion.jda.core.requests.restaction.MessageAction MessageAction}
      *         <br>The newly created Message after it has been sent to Discord.
      */
     default MessageAction sendMessageFormat(String format, Object... args)
@@ -269,7 +269,7 @@ public interface MessageChannel extends ISnowflake, Formattable
      *         If this is a {@link net.dv8tion.jda.core.entities.PrivateChannel PrivateChannel}
      *         and both the currently logged in account and the target user are bots.
      *
-     * @return {@link net.dv8tion.jda.core.requests.RestAction RestAction} - Type: {@link net.dv8tion.jda.core.entities.Message Message}
+     * @return {@link net.dv8tion.jda.core.requests.restaction.MessageAction MessageAction}
      *         <br>The newly created Message after it has been sent to Discord.
      *
      * @see    net.dv8tion.jda.core.MessageBuilder
@@ -335,7 +335,7 @@ public interface MessageChannel extends ISnowflake, Formattable
      *         If this is a {@link net.dv8tion.jda.core.entities.PrivateChannel PrivateChannel}
      *         and both the currently logged in account and the target user are bots.
      *
-     * @return {@link net.dv8tion.jda.core.requests.RestAction RestAction} - Type: {@link net.dv8tion.jda.core.entities.Message Message}
+     * @return {@link net.dv8tion.jda.core.requests.restaction.MessageAction MessageAction}
      *         <br>The newly created Message after it has been sent to Discord.
      *
      * @see    net.dv8tion.jda.core.MessageBuilder
@@ -385,7 +385,7 @@ public interface MessageChannel extends ISnowflake, Formattable
      *         If this is a {@link net.dv8tion.jda.core.entities.PrivateChannel PrivateChannel}
      *         and both the currently logged in account and the target user are bots.
      *
-     * @return {@link net.dv8tion.jda.core.requests.RestAction RestAction} - Type: {@link net.dv8tion.jda.core.entities.Message Message}
+     * @return {@link net.dv8tion.jda.core.requests.restaction.MessageAction MessageAction}
      *         <br>The {@link net.dv8tion.jda.core.entities.Message Message} created from this upload.
      */
     default MessageAction sendFile(File file, Message message)
@@ -464,7 +464,7 @@ public interface MessageChannel extends ISnowflake, Formattable
      *         If this is a {@link net.dv8tion.jda.core.entities.PrivateChannel PrivateChannel}
      *         and both the currently logged in account and the target user are bots.
      *
-     * @return {@link net.dv8tion.jda.core.requests.RestAction RestAction} - Type: {@link net.dv8tion.jda.core.entities.Message Message}
+     * @return {@link net.dv8tion.jda.core.requests.restaction.MessageAction MessageAction}
      *         <br>The {@link net.dv8tion.jda.core.entities.Message Message} created from this upload.
      */
     default MessageAction sendFile(File file, String fileName, Message message)
@@ -511,7 +511,7 @@ public interface MessageChannel extends ISnowflake, Formattable
      *         If this is a {@link net.dv8tion.jda.core.entities.PrivateChannel PrivateChannel}
      *         and both the currently logged in account and the target user are bots.
      *
-     * @return {@link net.dv8tion.jda.core.requests.RestAction RestAction} - Type: {@link net.dv8tion.jda.core.entities.Message Message}
+     * @return {@link net.dv8tion.jda.core.requests.restaction.MessageAction MessageAction}
      *         <br>The {@link net.dv8tion.jda.core.entities.Message Message} created from this upload.
      */
     default MessageAction sendFile(InputStream data, String fileName, Message message)
@@ -559,7 +559,7 @@ public interface MessageChannel extends ISnowflake, Formattable
      *         If this is a {@link net.dv8tion.jda.core.entities.PrivateChannel PrivateChannel}
      *         and both the currently logged in account and the target user are bots.
      *
-     * @return {@link net.dv8tion.jda.core.requests.RestAction RestAction} - Type: {@link net.dv8tion.jda.core.entities.Message Message}
+     * @return {@link net.dv8tion.jda.core.requests.restaction.MessageAction MessageAction}
      *         <br>The {@link net.dv8tion.jda.core.entities.Message Message} created from this upload.
      */
     default MessageAction sendFile(byte[] data, String fileName, Message message)
@@ -1666,7 +1666,7 @@ public interface MessageChannel extends ISnowflake, Formattable
      *         If this is a TextChannel and this account does not have
      *         {@link net.dv8tion.jda.core.Permission#MESSAGE_READ Permission.MESSAGE_READ}
      *
-     * @return {@link net.dv8tion.jda.core.requests.RestAction RestAction} - Type: {@link net.dv8tion.jda.core.entities.Message}
+     * @return {@link net.dv8tion.jda.core.requests.restaction.MessageAction MessageAction}
      *         <br>The modified Message after it has been sent to Discord.
      */
     default MessageAction editMessageById(String messageId, CharSequence newContent)
@@ -1716,7 +1716,7 @@ public interface MessageChannel extends ISnowflake, Formattable
      *         If this is a TextChannel and this account does not have
      *         {@link net.dv8tion.jda.core.Permission#MESSAGE_READ Permission.MESSAGE_READ}
      *
-     * @return {@link net.dv8tion.jda.core.requests.RestAction RestAction} - Type: {@link net.dv8tion.jda.core.entities.Message}
+     * @return {@link net.dv8tion.jda.core.requests.restaction.MessageAction MessageAction}
      *         <br>The modified Message after it has been sent to Discord.
      */
     default MessageAction editMessageById(long messageId, CharSequence newContent)
@@ -1764,8 +1764,8 @@ public interface MessageChannel extends ISnowflake, Formattable
      *         If this is a TextChannel and this account does not have
      *         {@link net.dv8tion.jda.core.Permission#MESSAGE_READ Permission.MESSAGE_READ}
      *
-     * @return {@link net.dv8tion.jda.core.requests.RestAction RestAction} - Type: {@link net.dv8tion.jda.core.entities.Message}
-     *         <br>The modified Message
+     * @return {@link net.dv8tion.jda.core.requests.restaction.MessageAction MessageAction}
+     *         <br>The modified Message after it has been sent to discord
      */
     default MessageAction editMessageById(String messageId, Message newContent)
     {
@@ -1816,8 +1816,8 @@ public interface MessageChannel extends ISnowflake, Formattable
      *         If this is a TextChannel and this account does not have
      *         {@link net.dv8tion.jda.core.Permission#MESSAGE_READ Permission.MESSAGE_READ}
      *
-     * @return {@link net.dv8tion.jda.core.requests.RestAction RestAction} - Type: {@link net.dv8tion.jda.core.entities.Message}
-     *         <br>The modified Message
+     * @return {@link net.dv8tion.jda.core.requests.restaction.MessageAction MessageAction}
+     *         <br>The modified Message after it has been sent to discord
      */
     default MessageAction editMessageById(long messageId, Message newContent)
     {
@@ -1866,8 +1866,8 @@ public interface MessageChannel extends ISnowflake, Formattable
      *         If this is a TextChannel and this account does not have
      *         {@link net.dv8tion.jda.core.Permission#MESSAGE_READ Permission.MESSAGE_READ}
      *
-     * @return {@link net.dv8tion.jda.core.requests.RestAction RestAction} - Type: {@link net.dv8tion.jda.core.entities.Message}
-     *         <br>The modified Message
+     * @return {@link net.dv8tion.jda.core.requests.restaction.MessageAction MessageAction}
+     *         <br>The modified Message after it has been sent to discord
      */
     default MessageAction editMessageFormatById(String messageId, String format, Object... args)
     {
@@ -1917,8 +1917,8 @@ public interface MessageChannel extends ISnowflake, Formattable
      *         If this is a TextChannel and this account does not have
      *         {@link net.dv8tion.jda.core.Permission#MESSAGE_READ Permission.MESSAGE_READ}
      *
-     * @return {@link net.dv8tion.jda.core.requests.RestAction RestAction} - Type: {@link net.dv8tion.jda.core.entities.Message}
-     *         <br>The modified Message
+     * @return {@link net.dv8tion.jda.core.requests.restaction.MessageAction MessageAction}
+     *         <br>The modified Message after it has been sent to discord
      */
     default MessageAction editMessageFormatById(long messageId, String format, Object... args)
     {
@@ -1967,8 +1967,8 @@ public interface MessageChannel extends ISnowflake, Formattable
      *         {@link net.dv8tion.jda.core.Permission#MESSAGE_READ Permission.MESSAGE_READ}
      *         or {@link net.dv8tion.jda.core.Permission#MESSAGE_WRITE Permission.MESSAGE_WRITE}
      *
-     * @return {@link net.dv8tion.jda.core.requests.RestAction RestAction} - Type: {@link net.dv8tion.jda.core.entities.Message}
-     *         <br>The modified Message
+     * @return {@link net.dv8tion.jda.core.requests.restaction.MessageAction MessageAction}
+     *         <br>The modified Message after it has been sent to discord
      */
     default MessageAction editMessageById(String messageId, MessageEmbed newEmbed)
     {
@@ -2016,8 +2016,8 @@ public interface MessageChannel extends ISnowflake, Formattable
      *         {@link net.dv8tion.jda.core.Permission#MESSAGE_READ Permission.MESSAGE_READ}
      *         or {@link net.dv8tion.jda.core.Permission#MESSAGE_WRITE Permission.MESSAGE_WRITE}
      *
-     * @return {@link net.dv8tion.jda.core.requests.RestAction RestAction} - Type: {@link net.dv8tion.jda.core.entities.Message}
-     *         <br>The modified Message
+     * @return {@link net.dv8tion.jda.core.requests.restaction.MessageAction MessageAction}
+     *         <br>The modified Message after it has been sent to discord
      */
     default MessageAction editMessageById(long messageId, MessageEmbed newEmbed)
     {

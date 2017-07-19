@@ -38,7 +38,7 @@ import java.util.Map;
 public class MessageAction extends RestAction<Message> implements Appendable
 {
     protected final Map<String, InputStream> files = new HashMap<>();
-    protected StringBuilder content = new StringBuilder();
+    protected final StringBuilder content;
     protected MessageEmbed embed = null;
     protected String nonce = null;
     protected boolean tts = false, override = false;
@@ -46,14 +46,22 @@ public class MessageAction extends RestAction<Message> implements Appendable
     public MessageAction(JDA api, Route.CompiledRoute route)
     {
         super(api, route);
+        content = new StringBuilder();
+    }
+
+    public MessageAction(JDA api, Route.CompiledRoute route, StringBuilder contentBuilder)
+    {
+        super(api, route);
+        if (contentBuilder.length() > Message.MAX_CONTENT_LENGTH)
+            throw new IllegalArgumentException("Cannot build a Message with more than 2000 characters. Please limit your input.");
+        this.content = contentBuilder;
     }
 
     public MessageAction apply(final Message message)
     {
         if (message == null)
             return this;
-        content(message.getContentRaw()).tts(message.isTTS());
-        List<MessageEmbed> embeds = message.getEmbeds();
+        final List<MessageEmbed> embeds = message.getEmbeds();
         if (embeds != null && !embeds.isEmpty())
             this.embed = embeds.get(0);
 
@@ -68,7 +76,7 @@ public class MessageAction extends RestAction<Message> implements Appendable
                 JDAImpl.LOG.log(ex);
             }
         }
-        return this;
+        return content(message.getContentRaw()).tts(message.isTTS());
     }
 
     public boolean isEmpty()
@@ -157,7 +165,7 @@ public class MessageAction extends RestAction<Message> implements Appendable
 
     public MessageAction addFile(final InputStream data, final String name)
     {
-        checkEdit("Cannot add files to an existing message! Edit-Message does not support this operation!");
+        checkEdit();
         Checks.notNull(data, "Data");
         Checks.notBlank(name, "Name");
         checkFileAmount();
@@ -167,7 +175,7 @@ public class MessageAction extends RestAction<Message> implements Appendable
 
     public MessageAction addFile(final byte[] data, final String name)
     {
-        checkEdit("Cannot add files to an existing message! Edit-Message does not support this operation!");
+        checkEdit();
         Checks.notNull(data, "Data");
         Checks.notBlank(name, "Name");
         Checks.check(data.length <= Message.MAX_FILE_SIZE, "File may not exceed the maximum file length of 8MB!");
@@ -184,7 +192,7 @@ public class MessageAction extends RestAction<Message> implements Appendable
 
     public MessageAction addFile(final File file, final String name)
     {
-        checkEdit("Cannot add files to an existing message! Edit-Message does not support this operation!");
+        checkEdit();
         Checks.notNull(file, "File");
         Checks.notBlank(name, "File Name");
         Checks.check(file.exists() && file.canRead(),
@@ -227,6 +235,11 @@ public class MessageAction extends RestAction<Message> implements Appendable
         if (!isEmpty())
             builder.addFormDataPart("payload_json", getJSON().toString());
         return builder.build();
+    }
+
+    protected RequestBody asJSON()
+    {
+        return RequestBody.create(MediaType.parse("application/json"), getJSON().toString());
     }
 
     protected JSONObject getJSON()
@@ -272,10 +285,10 @@ public class MessageAction extends RestAction<Message> implements Appendable
             throw new IllegalStateException("Cannot add more than " + Message.MAX_FILE_AMOUNT + " files!");
     }
 
-    protected void checkEdit(final String message)
+    protected void checkEdit()
     {
         if (isEdit())
-            throw new IllegalStateException(message);
+            throw new IllegalStateException("Cannot add files to an existing message! Edit-Message does not support this operation!");
     }
 
     @Override
@@ -284,7 +297,7 @@ public class MessageAction extends RestAction<Message> implements Appendable
         if (!files.isEmpty())
             return asMultipart();
         else if (!isEmpty())
-            return RequestBody.create(MediaType.parse("application/json"), getJSON().toString());
+            return asJSON();
         throw new IllegalStateException("Cannot build a message without content!");
     }
 

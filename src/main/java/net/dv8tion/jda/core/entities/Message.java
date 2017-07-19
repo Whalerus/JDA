@@ -25,7 +25,6 @@ import net.dv8tion.jda.core.requests.restaction.MessageAction;
 import net.dv8tion.jda.core.utils.Checks;
 import net.dv8tion.jda.core.utils.IOConsumer;
 import net.dv8tion.jda.core.utils.IOUtil;
-import okhttp3.Call;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -496,8 +495,8 @@ public interface Message extends ISnowflake, Formattable
      *         If the message attempting to be edited was not created by the currently logged in account, or if
      *         {@code newContent}'s length is 0 or greater than 2000.
      *
-     * @return {@link net.dv8tion.jda.core.requests.RestAction RestAction} - Type: {@link net.dv8tion.jda.core.entities.Message Message}
-     *     <br>The {@link net.dv8tion.jda.core.entities.Message Message} with the updated content
+     * @return {@link net.dv8tion.jda.core.requests.restaction.MessageAction MessageAction}
+     *         <br>The {@link net.dv8tion.jda.core.entities.Message Message} with the updated content
      */
     MessageAction editMessage(CharSequence newContent);
 
@@ -528,8 +527,8 @@ public interface Message extends ISnowflake, Formattable
      *         if the passed-in embed is {@code null}
      *         or not {@link net.dv8tion.jda.core.entities.MessageEmbed#isSendable(net.dv8tion.jda.core.AccountType) sendable}
      *
-     * @return {@link net.dv8tion.jda.core.requests.RestAction RestAction} - Type: {@link net.dv8tion.jda.core.entities.Message Message}
-     *     <br>The {@link net.dv8tion.jda.core.entities.Message Message} with the updated content
+     * @return {@link net.dv8tion.jda.core.requests.restaction.MessageAction MessageAction}
+     *         <br>The {@link net.dv8tion.jda.core.entities.Message Message} with the updated content
      */
     MessageAction editMessage(MessageEmbed newContent);
 
@@ -565,8 +564,8 @@ public interface Message extends ISnowflake, Formattable
      * @throws IllegalStateException
      *         If the message attempting to be edited was not created by the currently logged in account
      *
-     * @return {@link net.dv8tion.jda.core.requests.RestAction RestAction} - Type: {@link net.dv8tion.jda.core.entities.Message Message}
-     *     <br>The {@link net.dv8tion.jda.core.entities.Message Message} with the updated content
+     * @return {@link net.dv8tion.jda.core.requests.restaction.MessageAction MessageAction}
+     *         <br>The {@link net.dv8tion.jda.core.entities.Message Message} with the updated content
      */
     MessageAction editMessageFormat(String format, Object... args);
 
@@ -599,8 +598,8 @@ public interface Message extends ISnowflake, Formattable
      *                 {@link net.dv8tion.jda.core.entities.MessageEmbed#isSendable(net.dv8tion.jda.core.AccountType) sendable}</li>
      *         </ul>
      *
-     * @return {@link net.dv8tion.jda.core.requests.RestAction RestAction} - Type: {@link net.dv8tion.jda.core.entities.Message Message}
-     *     <br>The {@link net.dv8tion.jda.core.entities.Message Message} with the updated content
+     * @return {@link net.dv8tion.jda.core.requests.restaction.MessageAction MessageAction}
+     *         <br>The {@link net.dv8tion.jda.core.entities.Message Message} with the updated content
      */
     MessageAction editMessage(Message newContent);
 
@@ -1019,14 +1018,7 @@ public interface Message extends ISnowflake, Formattable
          */
         public InputStream getInputStream() throws IOException
         {
-            final OkHttpClient client = jda.getRequester().getHttpClient();
-            final Request request = new Request.Builder()
-                        .url(getUrl())
-                        .addHeader("user-agent", Requester.USER_AGENT)
-                        .addHeader("accept-encoding", "gzip")
-                        .build();
-            Call call = client.newCall(request);
-            try (Response response = call.execute())
+            try (Response response = openConnection())
             {
                 // creates a copy in order to properly close the response
                 InputStream in = Requester.getBody(response);
@@ -1053,17 +1045,20 @@ public interface Message extends ISnowflake, Formattable
         public void withInputStream(IOConsumer<InputStream> then) throws IOException
         {
             Checks.notNull(then, "Consumer");
-            final OkHttpClient client = jda.getRequester().getHttpClient();
-            final Request request = new Request.Builder()
-                .url(getUrl())
-                .addHeader("user-agent", Requester.USER_AGENT)
-                .addHeader("accept-encoding", "gzip")
-                .build();
-            Call call = client.newCall(request);
-            try (Response response = call.execute())
+            try (Response response = openConnection())
             {
                 then.accept(Requester.getBody(response));
             }
+        }
+
+        protected Response openConnection() throws IOException
+        {
+            final OkHttpClient client = jda.getRequester().getHttpClient();
+            final Request request = new Request.Builder().url(getUrl())
+                        .addHeader("user-agent", Requester.USER_AGENT)
+                        .addHeader("accept-encoding", "gzip")
+                        .build();
+            return client.newCall(request).execute();
         }
 
         /**

@@ -18,6 +18,9 @@ package net.dv8tion.jda.core;
 import net.dv8tion.jda.core.entities.*;
 import net.dv8tion.jda.core.entities.impl.MessageEmbedImpl;
 import net.dv8tion.jda.core.entities.impl.message.DataMessage;
+import net.dv8tion.jda.core.exceptions.PermissionException;
+import net.dv8tion.jda.core.requests.Route;
+import net.dv8tion.jda.core.requests.restaction.MessageAction;
 import net.dv8tion.jda.core.utils.Checks;
 
 import java.util.LinkedList;
@@ -757,6 +760,44 @@ public class MessageBuilder implements Appendable
     }
 
     /**
+     * Creates a {@link net.dv8tion.jda.core.requests.restaction.MessageAction MessageAction}
+     * with the current settings without building a {@link net.dv8tion.jda.core.entities.Message Message} instance first.
+     *
+     * @param  channel
+     *         The not-null target {@link net.dv8tion.jda.core.entities.MessageChannel MessageChannel}
+     *
+     * @throws java.lang.IllegalArgumentException
+     *         If the provided channel is {@code null}
+     * @throws net.dv8tion.jda.core.exceptions.PermissionException
+     *         If the currently logged in account does not have permission to send or read messages in this channel,
+     *         or if this is a PrivateChannel and both users (sender and receiver) are bots.
+     *
+     * @return {@link net.dv8tion.jda.core.requests.restaction.MessageAction MessageAction}
+     */
+    public MessageAction sendTo(MessageChannel channel)
+    {
+        Checks.notNull(channel, "Target Channel");
+        switch (channel.getType())
+        {
+            case TEXT:
+                final TextChannel text = (TextChannel) channel;
+                final Member self = text.getGuild().getSelfMember();
+                if (!self.hasPermission(text, Permission.MESSAGE_READ))
+                    throw new PermissionException(Permission.MESSAGE_READ);
+                if (!self.hasPermission(text, Permission.MESSAGE_WRITE))
+                    throw new PermissionException(Permission.MESSAGE_WRITE);
+                break;
+            case PRIVATE:
+                final PrivateChannel priv = (PrivateChannel) channel;
+                if (priv.getUser().isBot() && channel.getJDA().getAccountType() == AccountType.BOT)
+                    throw new UnsupportedOperationException("Cannot send a private message between bots.");
+        }
+        final Route.CompiledRoute route = Route.Messages.SEND_MESSAGE.compile(channel.getId());
+        final MessageAction action = new MessageAction(channel.getJDA(), route, builder);
+        return action.tts(isTTS).embed(embed).nonce(nonce);
+    }
+
+    /**
      * Creates a {@link java.util.Queue Queue} of {@link net.dv8tion.jda.core.entities.Message Message} objects from this MessageBuilder.
      *
      * <p>This method splits the content if it exceeds 2000 chars. The splitting behaviour can be customized using {@link SplitPolicy SplitPolicies}.
@@ -769,7 +810,7 @@ public class MessageBuilder implements Appendable
      * @param  policy
      *         The {@link net.dv8tion.jda.core.MessageBuilder.SplitPolicy} defining how to split the text in the
      *         MessageBuilder into different, individual messages.
-     * 
+     *
      * @return the created {@link net.dv8tion.jda.core.entities.Message Messages}
      */
     public Queue<Message> buildAll(SplitPolicy... policy)

@@ -130,6 +130,9 @@ public class MessageBuilder implements Appendable
      *         Validation nonce string
      *
      * @return The {@link net.dv8tion.jda.core.MessageBuilder MessageBuilder} instance. Useful for chaining.
+     *
+     * @see    net.dv8tion.jda.core.entities.Message#getNonce()
+     * @see    <a href="https://en.wikipedia.org/wiki/Cryptographic_nonce" target="_blank">Cryptographic Nonce - Wikipedia</a>
      */
     public MessageBuilder setNonce(String nonce)
     {
@@ -266,6 +269,13 @@ public class MessageBuilder implements Appendable
      *
      * @throws java.lang.IllegalArgumentException
      *         If the provided format string is {@code null} or empty
+     * @throws java.util.IllegalFormatException
+     *         If a format string contains an illegal syntax,
+     *         a format specifier that is incompatible with the given arguments,
+     *         insufficient arguments given the format string, or other illegal conditions.
+     *         For specification of all possible formatting errors,
+     *         see the <a href="../util/Formatter.html#detail">Details</a>
+     *         section of the formatter class specification.
      *
      * @return The {@link net.dv8tion.jda.core.MessageBuilder MessageBuilder} instance. Useful for chaining.
      */

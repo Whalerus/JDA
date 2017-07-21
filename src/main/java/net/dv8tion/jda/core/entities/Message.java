@@ -330,6 +330,9 @@ public interface Message extends ISnowflake, Formattable
      * <br>To set a nonce before sending you may use {@link net.dv8tion.jda.core.MessageBuilder#setNonce(String) MessageBuilder.setNonce(String)}!
      *
      * @return The validation nonce
+     *
+     * @see    net.dv8tion.jda.core.MessageBuilder#setNonce(String)
+     * @see    <a href="https://en.wikipedia.org/wiki/Cryptographic_nonce" target="_blank">Cryptographic Nonce - Wikipedia</a>
      */
     String getNonce();
 
@@ -561,6 +564,13 @@ public interface Message extends ISnowflake, Formattable
      * @throws IllegalArgumentException
      *         If the provided format String is {@code null} or blank, or if
      *         the created message exceeds the 2000 character limit
+     * @throws java.util.IllegalFormatException
+     *         If a format string contains an illegal syntax,
+     *         a format specifier that is incompatible with the given arguments,
+     *         insufficient arguments given the format string, or other illegal conditions.
+     *         For specification of all possible formatting errors,
+     *         see the <a href="../util/Formatter.html#detail">Details</a>
+     *         section of the formatter class specification.
      * @throws IllegalStateException
      *         If the message attempting to be edited was not created by the currently logged in account
      *

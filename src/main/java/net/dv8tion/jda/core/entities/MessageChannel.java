@@ -223,6 +223,13 @@ public interface MessageChannel extends ISnowflake, Formattable
      * @throws java.lang.UnsupportedOperationException
      *         If this is a {@link net.dv8tion.jda.core.entities.PrivateChannel PrivateChannel}
      *         and both the currently logged in account and the target user are bots.
+     * @throws java.util.IllegalFormatException
+     *         If a format string contains an illegal syntax,
+     *         a format specifier that is incompatible with the given arguments,
+     *         insufficient arguments given the format string, or other illegal conditions.
+     *         For specification of all possible formatting errors,
+     *         see the <a href="../util/Formatter.html#detail">Details</a>
+     *         section of the formatter class specification.
      *
      * @return {@link net.dv8tion.jda.core.requests.restaction.MessageAction MessageAction}
      *         <br>The newly created Message after it has been sent to Discord.
@@ -1865,6 +1872,13 @@ public interface MessageChannel extends ISnowflake, Formattable
      * @throws net.dv8tion.jda.core.exceptions.PermissionException
      *         If this is a TextChannel and this account does not have
      *         {@link net.dv8tion.jda.core.Permission#MESSAGE_READ Permission.MESSAGE_READ}
+     * @throws java.util.IllegalFormatException
+     *         If a format string contains an illegal syntax,
+     *         a format specifier that is incompatible with the given arguments,
+     *         insufficient arguments given the format string, or other illegal conditions.
+     *         For specification of all possible formatting errors,
+     *         see the <a href="../util/Formatter.html#detail">Details</a>
+     *         section of the formatter class specification.
      *
      * @return {@link net.dv8tion.jda.core.requests.restaction.MessageAction MessageAction}
      *         <br>The modified Message after it has been sent to discord
@@ -1916,6 +1930,13 @@ public interface MessageChannel extends ISnowflake, Formattable
      * @throws net.dv8tion.jda.core.exceptions.PermissionException
      *         If this is a TextChannel and this account does not have
      *         {@link net.dv8tion.jda.core.Permission#MESSAGE_READ Permission.MESSAGE_READ}
+     * @throws java.util.IllegalFormatException
+     *         If a format string contains an illegal syntax,
+     *         a format specifier that is incompatible with the given arguments,
+     *         insufficient arguments given the format string, or other illegal conditions.
+     *         For specification of all possible formatting errors,
+     *         see the <a href="../util/Formatter.html#detail">Details</a>
+     *         section of the formatter class specification.
      *
      * @return {@link net.dv8tion.jda.core.requests.restaction.MessageAction MessageAction}
      *         <br>The modified Message after it has been sent to discord

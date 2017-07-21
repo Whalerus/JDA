@@ -19,10 +19,7 @@ package net.dv8tion.jda.core.entities.impl;
 import net.dv8tion.jda.client.entities.Call;
 import net.dv8tion.jda.core.AccountType;
 import net.dv8tion.jda.core.JDA;
-import net.dv8tion.jda.core.entities.ChannelType;
-import net.dv8tion.jda.core.entities.Message;
-import net.dv8tion.jda.core.entities.PrivateChannel;
-import net.dv8tion.jda.core.entities.User;
+import net.dv8tion.jda.core.entities.*;
 import net.dv8tion.jda.core.requests.Request;
 import net.dv8tion.jda.core.requests.Response;
 import net.dv8tion.jda.core.requests.RestAction;
@@ -127,6 +124,20 @@ public class PrivateChannelImpl implements PrivateChannel
     }
 
     @Override
+    public MessageAction sendMessage(CharSequence text)
+    {
+        checkBot();
+        return PrivateChannel.super.sendMessage(text);
+    }
+
+    @Override
+    public MessageAction sendMessage(MessageEmbed embed)
+    {
+        checkBot();
+        return PrivateChannel.super.sendMessage(embed);
+    }
+
+    @Override
     public MessageAction sendMessage(Message msg)
     {
         checkBot();
@@ -135,13 +146,6 @@ public class PrivateChannelImpl implements PrivateChannel
 
     @Override
     public MessageAction sendFile(InputStream data, String fileName, Message message)
-    {
-        checkBot();
-        return PrivateChannel.super.sendFile(data, fileName, message);
-    }
-
-    @Override
-    public MessageAction sendFile(byte[] data, String fileName, Message message)
     {
         checkBot();
         return PrivateChannel.super.sendFile(data, fileName, message);

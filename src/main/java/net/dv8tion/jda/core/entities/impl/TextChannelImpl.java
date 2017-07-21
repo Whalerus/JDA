@@ -222,6 +222,26 @@ public class TextChannelImpl extends AbstractChannelImpl<TextChannelImpl> implem
     }
 
     @Override
+    public MessageAction sendMessage(CharSequence text)
+    {
+        checkVerification();
+        checkPermission(Permission.MESSAGE_READ);
+        checkPermission(Permission.MESSAGE_WRITE);
+        return TextChannel.super.sendMessage(text);
+    }
+
+    @Override
+    public MessageAction sendMessage(MessageEmbed embed)
+    {
+        checkVerification();
+        checkPermission(Permission.MESSAGE_READ);
+        checkPermission(Permission.MESSAGE_WRITE);
+        // this is checked because you cannot send an empty message
+        checkPermission(Permission.MESSAGE_EMBED_LINKS);
+        return TextChannel.super.sendMessage(embed);
+    }
+
+    @Override
     public MessageAction sendMessage(Message msg)
     {
         Checks.notNull(msg, "Message");
@@ -238,18 +258,6 @@ public class TextChannelImpl extends AbstractChannelImpl<TextChannelImpl> implem
 
     @Override
     public MessageAction sendFile(InputStream data, String fileName, Message message)
-    {
-        checkVerification();
-        checkPermission(Permission.MESSAGE_READ);
-        checkPermission(Permission.MESSAGE_WRITE);
-        checkPermission(Permission.MESSAGE_ATTACH_FILES);
-
-        //Call MessageChannel's default method
-        return TextChannel.super.sendFile(data, fileName, message);
-    }
-
-    @Override
-    public MessageAction sendFile(byte[] data, String fileName, Message message)
     {
         checkVerification();
         checkPermission(Permission.MESSAGE_READ);
@@ -357,6 +365,23 @@ public class TextChannelImpl extends AbstractChannelImpl<TextChannelImpl> implem
                     request.onFailure(response);
             }
         };
+    }
+
+    @Override
+    public MessageAction editMessageById(String messageId, CharSequence newContent)
+    {
+        checkPermission(Permission.MESSAGE_READ);
+        checkPermission(Permission.MESSAGE_WRITE);
+        return TextChannel.super.editMessageById(messageId, newContent);
+    }
+
+    @Override
+    public MessageAction editMessageById(String messageId, MessageEmbed newEmbed)
+    {
+        checkPermission(Permission.MESSAGE_READ);
+        checkPermission(Permission.MESSAGE_WRITE);
+        checkPermission(Permission.MESSAGE_EMBED_LINKS);
+        return TextChannel.super.editMessageById(messageId, newEmbed);
     }
 
     @Override

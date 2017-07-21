@@ -18,10 +18,11 @@ package net.dv8tion.jda.core.requests.restaction;
 
 import net.dv8tion.jda.core.AccountType;
 import net.dv8tion.jda.core.JDA;
-import net.dv8tion.jda.core.entities.Message;
-import net.dv8tion.jda.core.entities.MessageEmbed;
+import net.dv8tion.jda.core.Permission;
+import net.dv8tion.jda.core.entities.*;
 import net.dv8tion.jda.core.entities.impl.JDAImpl;
 import net.dv8tion.jda.core.entities.impl.MessageEmbedImpl;
+import net.dv8tion.jda.core.exceptions.PermissionException;
 import net.dv8tion.jda.core.requests.*;
 import net.dv8tion.jda.core.utils.Checks;
 import net.dv8tion.jda.core.utils.MiscUtil;
@@ -62,25 +63,28 @@ import java.util.Map;
  */
 public class MessageAction extends RestAction<Message> implements Appendable
 {
-    public static final String CONTENT_TOO_BIG = "A message may not exceed " + Message.MAX_CONTENT_LENGTH + " characters. Please limit your input!";
+    private static final String CONTENT_TOO_BIG = "A message may not exceed " + Message.MAX_CONTENT_LENGTH + " characters. Please limit your input!";
     protected final Map<String, InputStream> files = new HashMap<>();
     protected final StringBuilder content;
+    protected final MessageChannel channel;
     protected MessageEmbed embed = null;
     protected String nonce = null;
     protected boolean tts = false, override = false;
 
-    public MessageAction(JDA api, Route.CompiledRoute route)
+    public MessageAction(JDA api, Route.CompiledRoute route, MessageChannel channel)
     {
         super(api, route);
-        content = new StringBuilder();
+        this.content = new StringBuilder();
+        this.channel = channel;
     }
 
-    public MessageAction(JDA api, Route.CompiledRoute route, StringBuilder contentBuilder)
+    public MessageAction(JDA api, Route.CompiledRoute route, MessageChannel channel, StringBuilder contentBuilder)
     {
         super(api, route);
         if (contentBuilder.length() > Message.MAX_CONTENT_LENGTH)
             throw new IllegalArgumentException("Cannot build a Message with more than 2000 characters. Please limit your input.");
         this.content = contentBuilder;
+        this.channel = channel;
     }
 
     /**
@@ -342,6 +346,9 @@ public class MessageAction extends RestAction<Message> implements Appendable
      *         or if this MessageAction will perform an edit operation on an existing Message (see {@link #isEdit()})
      * @throws java.lang.IllegalArgumentException
      *         If the provided data is {@code null} or the provided name is blank or {@code null}
+     * @throws net.dv8tion.jda.core.exceptions.PermissionException
+     *         If this is targeting a TextChannel and the currently logged in account does not have
+     *         {@link net.dv8tion.jda.core.Permission#MESSAGE_ATTACH_FILES Permission.MESSAGE_ATTACH_FILES}
      *
      * @return Updated MessageAction for chaining convenience
      */
@@ -351,6 +358,7 @@ public class MessageAction extends RestAction<Message> implements Appendable
         Checks.notNull(data, "Data");
         Checks.notBlank(name, "Name");
         checkFileAmount();
+        checkPermission(Permission.MESSAGE_ATTACH_FILES);
         files.put(name, data);
         return this;
     }
@@ -373,6 +381,9 @@ public class MessageAction extends RestAction<Message> implements Appendable
      * @throws java.lang.IllegalArgumentException
      *         If the provided data is {@code null} or the provided name is blank or {@code null}
      *         or if the provided data exceeds the maximum file size of 8MB
+     * @throws net.dv8tion.jda.core.exceptions.PermissionException
+     *         If this is targeting a TextChannel and the currently logged in account does not have
+     *         {@link net.dv8tion.jda.core.Permission#MESSAGE_ATTACH_FILES Permission.MESSAGE_ATTACH_FILES}
      *
      * @return Updated MessageAction for chaining convenience
      */
@@ -383,6 +394,7 @@ public class MessageAction extends RestAction<Message> implements Appendable
         Checks.notBlank(name, "Name");
         Checks.check(data.length <= Message.MAX_FILE_SIZE, "File may not exceed the maximum file length of 8MB!");
         checkFileAmount();
+        checkPermission(Permission.MESSAGE_ATTACH_FILES);
         files.put(name, new ByteArrayInputStream(data));
         return this;
     }
@@ -401,6 +413,9 @@ public class MessageAction extends RestAction<Message> implements Appendable
      *         or if this MessageAction will perform an edit operation on an existing Message (see {@link #isEdit()})
      * @throws java.lang.IllegalArgumentException
      *         If the provided file is {@code null} or if the provided File is bigger than 8MB
+     * @throws net.dv8tion.jda.core.exceptions.PermissionException
+     *         If this is targeting a TextChannel and the currently logged in account does not have
+     *         {@link net.dv8tion.jda.core.Permission#MESSAGE_ATTACH_FILES Permission.MESSAGE_ATTACH_FILES}
      *
      * @return Updated MessageAction for chaining convenience
      */
@@ -428,6 +443,9 @@ public class MessageAction extends RestAction<Message> implements Appendable
      * @throws java.lang.IllegalArgumentException
      *         If the provided file is {@code null} or the provided name is blank or {@code null}
      *         or if the provided file is bigger than 8MB, or if the provided file does not exist/ is not readable
+     * @throws net.dv8tion.jda.core.exceptions.PermissionException
+     *         If this is targeting a TextChannel and the currently logged in account does not have
+     *         {@link net.dv8tion.jda.core.Permission#MESSAGE_ATTACH_FILES Permission.MESSAGE_ATTACH_FILES}
      *
      * @return Updated MessageAction for chaining convenience
      */
@@ -440,6 +458,7 @@ public class MessageAction extends RestAction<Message> implements Appendable
             "Provided file either does not exist or cannot be read from!");
         Checks.check(file.length() <= Message.MAX_FILE_SIZE, "File may not exceed the maximum file length of 8MB!");
         checkFileAmount();
+        checkPermission(Permission.MESSAGE_ATTACH_FILES);
         try
         {
             files.put(name, new FileInputStream(file));
@@ -543,6 +562,17 @@ public class MessageAction extends RestAction<Message> implements Appendable
     {
         if (isEdit())
             throw new IllegalStateException("Cannot add files to an existing message! Edit-Message does not support this operation!");
+    }
+
+    protected void checkPermission(Permission perm)
+    {
+        if (channel.getType() == ChannelType.TEXT)
+        {
+            final TextChannel text = (TextChannel) channel;
+            final Member self = text.getGuild().getSelfMember();
+            if (!self.hasPermission(text, perm))
+                throw new PermissionException(perm);
+        }
     }
 
     @Override

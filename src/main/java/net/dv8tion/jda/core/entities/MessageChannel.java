@@ -17,7 +17,6 @@ package net.dv8tion.jda.core.entities;
 
 import net.dv8tion.jda.core.AccountType;
 import net.dv8tion.jda.core.JDA;
-import net.dv8tion.jda.core.MessageBuilder;
 import net.dv8tion.jda.core.exceptions.AccountTypeException;
 import net.dv8tion.jda.core.requests.Request;
 import net.dv8tion.jda.core.requests.Response;
@@ -30,8 +29,7 @@ import net.dv8tion.jda.core.utils.Checks;
 import net.dv8tion.jda.core.utils.MiscUtil;
 import org.json.JSONArray;
 
-import java.io.File;
-import java.io.InputStream;
+import java.io.*;
 import java.util.*;
 
 /**
@@ -185,7 +183,11 @@ public interface MessageChannel extends ISnowflake, Formattable
         Checks.notEmpty(text, "Provided text for message");
         Checks.check(text.length() <= 2000, "Provided text for message must be less than 2000 characters in length");
 
-        return sendMessage(new MessageBuilder(text).build());
+        Route.CompiledRoute route = Route.Messages.SEND_MESSAGE.compile(getId());
+        if (text instanceof StringBuilder)
+            return new MessageAction(getJDA(), route, this, (StringBuilder) text);
+        else
+            return new MessageAction(getJDA(), route, this).append(text);
     }
 
     /**
@@ -237,7 +239,7 @@ public interface MessageChannel extends ISnowflake, Formattable
     default MessageAction sendMessageFormat(String format, Object... args)
     {
         Checks.notEmpty(format, "Format");
-        return sendMessage(new MessageBuilder().appendFormat(format, args).build());
+        return sendMessage(String.format(format, args));
     }
 
     /**
@@ -286,7 +288,8 @@ public interface MessageChannel extends ISnowflake, Formattable
     {
         Checks.notNull(embed, "Provided embed");
 
-        return sendMessage(new MessageBuilder(embed).build());
+        Route.CompiledRoute route = Route.Messages.SEND_MESSAGE.compile(getId());
+        return new MessageAction(getJDA(), route, this).embed(embed);
     }
 
     /**
@@ -352,7 +355,7 @@ public interface MessageChannel extends ISnowflake, Formattable
         Checks.notNull(msg, "Message");
 
         Route.CompiledRoute route = Route.Messages.SEND_MESSAGE.compile(getId());
-        return new MessageAction(getJDA(), route).apply(msg);
+        return new MessageAction(getJDA(), route, this).apply(msg);
     }
 
     /**
@@ -483,8 +486,14 @@ public interface MessageChannel extends ISnowflake, Formattable
             "File is to big! Max file-size is 8MB");
         Checks.notNull(fileName, "fileName");
 
-        Route.CompiledRoute route = Route.Messages.SEND_MESSAGE.compile(getId());
-        return new MessageAction(getJDA(), route).addFile(file, fileName).apply(message);
+        try
+        {
+            return sendFile(new FileInputStream(file), fileName, message);
+        }
+        catch (FileNotFoundException ex)
+        {
+            throw new RuntimeException(ex);
+        }
     }
 
     /**
@@ -527,7 +536,7 @@ public interface MessageChannel extends ISnowflake, Formattable
         Checks.notNull(fileName, "fileName");
 
         Route.CompiledRoute route = Route.Messages.SEND_MESSAGE.compile(getId());
-        return new MessageAction(getJDA(), route).addFile(data, fileName).apply(message);
+        return new MessageAction(getJDA(), route, this).addFile(data, fileName).apply(message);
     }
 
     /**
@@ -573,9 +582,9 @@ public interface MessageChannel extends ISnowflake, Formattable
     {
         Checks.notNull(data, "file data[]");
         Checks.notNull(fileName, "fileName");
-
-        Route.CompiledRoute route = Route.Messages.SEND_MESSAGE.compile(getId());
-        return new MessageAction(getJDA(), route).addFile(data, fileName).apply(message);
+        Checks.check(data.length <= Message.MAX_FILE_SIZE,
+            "File is to big! Max file-size is 8MB");
+        return sendFile(new ByteArrayInputStream(data), fileName, message);
     }
 
     /**
@@ -1678,10 +1687,15 @@ public interface MessageChannel extends ISnowflake, Formattable
      */
     default MessageAction editMessageById(String messageId, CharSequence newContent)
     {
+        Checks.noWhitespace(messageId, "MessageId");
         Checks.notEmpty(newContent, "Provided message content");
         Checks.check(newContent.length() <= 2000, "Provided newContent length must be 2000 or less characters.");
 
-        return editMessageById(messageId, new MessageBuilder(newContent).build());
+        Route.CompiledRoute route = Route.Messages.EDIT_MESSAGE.compile(getId(), messageId);
+        if (newContent instanceof StringBuilder)
+            return new MessageAction(getJDA(), route, this, (StringBuilder) newContent);
+        else
+            return new MessageAction(getJDA(), route, this).append(newContent);
     }
 
     /**
@@ -1776,11 +1790,11 @@ public interface MessageChannel extends ISnowflake, Formattable
      */
     default MessageAction editMessageById(String messageId, Message newContent)
     {
-        Checks.notEmpty(messageId, "messageId");
+        Checks.noWhitespace(messageId, "messageId");
         Checks.notNull(newContent, "message");
 
         Route.CompiledRoute route = Route.Messages.EDIT_MESSAGE.compile(getId(), messageId);
-        return new MessageAction(getJDA(), route).apply(newContent);
+        return new MessageAction(getJDA(), route, this).apply(newContent);
     }
 
     /**
@@ -1886,7 +1900,7 @@ public interface MessageChannel extends ISnowflake, Formattable
     default MessageAction editMessageFormatById(String messageId, String format, Object... args)
     {
         Checks.notBlank(format, "Format String");
-        return editMessageById(messageId, new MessageBuilder().appendFormat(format, args).build());
+        return editMessageById(messageId, String.format(format, args));
     }
 
     /**
@@ -1944,7 +1958,7 @@ public interface MessageChannel extends ISnowflake, Formattable
     default MessageAction editMessageFormatById(long messageId, String format, Object... args)
     {
         Checks.notBlank(format, "Format String");
-        return editMessageById(messageId, new MessageBuilder().appendFormat(format, args).build());
+        return editMessageById(messageId, String.format(format, args));
     }
 
     /**
@@ -1993,7 +2007,11 @@ public interface MessageChannel extends ISnowflake, Formattable
      */
     default MessageAction editMessageById(String messageId, MessageEmbed newEmbed)
     {
-        return editMessageById(messageId, new MessageBuilder(newEmbed).build());
+        Checks.noWhitespace(messageId, "Message ID");
+        Checks.notNull(newEmbed, "MessageEmbed");
+
+        Route.CompiledRoute route = Route.Messages.EDIT_MESSAGE.compile(getId(), messageId);
+        return new MessageAction(getJDA(), route, this).embed(newEmbed);
     }
 
     /**

@@ -16,39 +16,30 @@
 
 package net.dv8tion.jda.core.entities.impl.message;
 
-import net.dv8tion.jda.client.entities.Group;
 import net.dv8tion.jda.core.entities.*;
 
-public class PinMessage extends SystemMessage
+public class WelcomeMessage extends SystemMessage
 {
-    public PinMessage(User author, MessageChannel channel, long messageId, String content)
+    public WelcomeMessage(User author, TextChannel channel, long messageId, String content)
     {
         super(author, channel, messageId, content);
     }
 
-    public PrivateChannel getPrivateChannel()
+    @Override
+    public ChannelType getChannelType()
     {
-        return isFromType(ChannelType.PRIVATE) ? (PrivateChannel) channel : null;
+        return ChannelType.TEXT;
     }
 
-    public Group getGroup()
+    @Override
+    public TextChannel getChannel()
     {
-        return isFromType(ChannelType.GROUP) ? (Group) channel : null;
-    }
-
-    public TextChannel getTextChannel()
-    {
-        return isFromType(ChannelType.TEXT) ? (TextChannel) channel : null;
-    }
-
-    public Guild getGuild()
-    {
-        return isFromType(ChannelType.TEXT) ? getTextChannel().getGuild() : null;
+        return (TextChannel) channel;
     }
 
     @Override
     public MessageType getType()
     {
-        return MessageType.CHANNEL_PINNED_ADD;
+        return MessageType.GUILD_MEMBER_JOIN;
     }
 }

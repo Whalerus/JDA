@@ -141,6 +141,7 @@ public abstract class ListenerAdapter implements EventListener
     public void onGuildMessageReactionAdd(GuildMessageReactionAddEvent event) {}
     public void onGuildMessageReactionRemove(GuildMessageReactionRemoveEvent event) {}
     public void onGuildMessageReactionRemoveAll(GuildMessageReactionRemoveAllEvent event) {}
+    public void onGuildMemberJoinMessage(GuildMemberJoinMessageEvent event) {}
 
     //Private Message Events
     public void onPrivateMessageReceived(PrivateMessageReceivedEvent event) {}
@@ -377,6 +378,8 @@ public abstract class ListenerAdapter implements EventListener
             onGuildMessageReactionRemove((GuildMessageReactionRemoveEvent) event);
         else if (event instanceof GuildMessageReactionRemoveAllEvent)
             onGuildMessageReactionRemoveAll((GuildMessageReactionRemoveAllEvent) event);
+        else if (event instanceof GuildMemberJoinMessageEvent)
+            onGuildMemberJoinMessage((GuildMemberJoinMessageEvent) event);
 
         //Private Message Events
         else if (event instanceof PrivateMessageReceivedEvent)

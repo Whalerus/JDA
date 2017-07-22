@@ -54,7 +54,12 @@ public enum MessageType
     /**
      * Specialized message used in MessageChannels as a System-Message to announce new pins
      */
-    PIN_ADD(6),
+    CHANNEL_PINNED_ADD(6),
+
+    /**
+     * Specialized message used to welcome new members in a Guild
+     */
+    GUILD_MEMBER_JOIN(7),
 
     /**
      * Unknown MessageType.

@@ -32,6 +32,7 @@ import net.dv8tion.jda.core.entities.impl.message.*;
 import net.dv8tion.jda.core.events.message.CallMessageEvent;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.core.events.message.PinMessageEvent;
+import net.dv8tion.jda.core.events.message.guild.GuildMemberJoinMessageEvent;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.core.events.message.priv.PrivateCallMessageEvent;
 import net.dv8tion.jda.core.events.message.priv.PrivateMessageReceivedEvent;
@@ -55,10 +56,12 @@ public class MessageCreateHandler extends SocketHandler
         {
             case DEFAULT:
                 return handleDefaultMessage(content);
-            case PIN_ADD:
+            case CHANNEL_PINNED_ADD:
                 return handlePinSystemMessage(content);
             case CALL:
                 return handleCallSystemMessage(content);
+            case GUILD_MEMBER_JOIN:
+                return handleWelcomeMessage(content);
             case CHANNEL_NAME_CHANGE:
             case CHANNEL_ICON_CHANGE:
             case RECIPIENT_ADD:
@@ -238,6 +241,29 @@ public class MessageCreateHandler extends SocketHandler
         PinMessage message = new PinMessage(user, channel, id, msgContent);
         api.getEventManager().handle(
             new PinMessageEvent(
+                api, responseNumber,
+                message, channel));
+        return null;
+    }
+
+    private Long handleWelcomeMessage(JSONObject content)
+    {
+        final long id = content.getLong("id");
+        final long channelId = content.getLong("channel_id");
+        final JSONObject authorObj = content.getJSONObject("author");
+        final long authorId = authorObj.getLong("id");
+
+        final TextChannel channel = api.getTextChannelById(channelId);
+        User author = api.getUserById(authorId);
+        if (author == null)
+        {
+            api.getEventCache().cache(EventCache.Type.USER, authorId, () -> handle(responseNumber, allContent));
+            EventCache.LOG.debug("Received WELCOME message for user that is not yet cached. userId: " + authorId + " messageId: " + id);
+            return null;
+        }
+        WelcomeMessage message = new WelcomeMessage(author, channel, id, content.getString("content"));
+        api.getEventManager().handle(
+            new GuildMemberJoinMessageEvent(
                 api, responseNumber,
                 message, channel));
         return null;

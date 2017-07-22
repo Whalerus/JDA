@@ -254,7 +254,14 @@ public class MessageCreateHandler extends SocketHandler
         final long authorId = authorObj.getLong("id");
 
         final TextChannel channel = api.getTextChannelById(channelId);
-        User author = api.getUserById(authorId);
+        if (channel == null)
+        {
+            api.getEventCache().cache(EventCache.Type.CHANNEL, channelId, () -> handle(responseNumber, allContent));
+            EventCache.LOG.debug("Received WELCOME message for channel that is not yet cached. channelId: " + channelId + " messageId: " + id);
+            return null;
+        }
+
+        final User author = api.getUserById(authorId);
         if (author == null)
         {
             api.getEventCache().cache(EventCache.Type.USER, authorId, () -> handle(responseNumber, allContent));

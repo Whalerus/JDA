@@ -1768,6 +1768,7 @@ public interface MessageChannel extends ISnowflake, Formattable
      * @return {@link net.dv8tion.jda.core.requests.restaction.MessageAction MessageAction}
      *         <br>The modified Message after it has been sent to Discord.
      */
+    @CheckReturnValue
     default MessageAction editMessageById(long messageId, CharSequence newContent)
     {
         return editMessageById(Long.toUnsignedString(messageId), newContent);

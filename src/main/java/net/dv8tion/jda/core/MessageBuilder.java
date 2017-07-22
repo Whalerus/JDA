@@ -23,6 +23,7 @@ import net.dv8tion.jda.core.requests.Route;
 import net.dv8tion.jda.core.requests.restaction.MessageAction;
 import net.dv8tion.jda.core.utils.Checks;
 
+import javax.annotation.CheckReturnValue;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
@@ -784,6 +785,7 @@ public class MessageBuilder implements Appendable
      *
      * @return {@link net.dv8tion.jda.core.requests.restaction.MessageAction MessageAction}
      */
+    @CheckReturnValue
     public MessageAction sendTo(MessageChannel channel)
     {
         Checks.notNull(channel, "Target Channel");

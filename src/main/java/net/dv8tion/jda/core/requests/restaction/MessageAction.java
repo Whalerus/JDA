@@ -31,6 +31,7 @@ import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 import org.json.JSONObject;
 
+import javax.annotation.CheckReturnValue;
 import java.io.*;
 import java.util.HashMap;
 import java.util.List;
@@ -88,6 +89,28 @@ public class MessageAction extends RestAction<Message> implements Appendable
     }
 
     /**
+     * Whether this MessageAction has no values set.
+     * <br>Trying to execute with {@code isEmpty() == true} will result in an {@link java.lang.IllegalStateException IllegalStateException}!
+     *
+     * @return True, if no settings have been applied
+     */
+    public boolean isEmpty()
+    {
+        return (content.length() == 0)
+            && (embed == null || embed.getLength() == 0);
+    }
+
+    /**
+     * Whether this MessageAction will be used to update an existing message.
+     *
+     * @return True, if this MessageAction targets an existing message
+     */
+    public boolean isEdit()
+    {
+        return finalizeRoute().getMethod() == Method.PATCH;
+    }
+
+    /**
      * Applies the sendable information of the provided {@link net.dv8tion.jda.core.entities.Message Message}
      * to this MessageAction settings.
      * <br>This will override all existing settings <b>if</b> new settings are available.
@@ -102,6 +125,7 @@ public class MessageAction extends RestAction<Message> implements Appendable
      *
      * @return Updated MessageAction for chaining convenience
      */
+    @CheckReturnValue
     public MessageAction apply(final Message message)
     {
         if (message == null)
@@ -125,28 +149,6 @@ public class MessageAction extends RestAction<Message> implements Appendable
     }
 
     /**
-     * Whether this MessageAction has no values set.
-     * <br>Trying to execute with {@code isEmpty() == true} will result in an {@link java.lang.IllegalStateException IllegalStateException}!
-     *
-     * @return True, if no settings have been applied
-     */
-    public boolean isEmpty()
-    {
-        return (content.length() == 0)
-            && (embed == null || embed.getLength() == 0);
-    }
-
-    /**
-     * Whether this MessageAction will be used to update an existing message.
-     *
-     * @return True, if this MessageAction targets an existing message
-     */
-    public boolean isEdit()
-    {
-        return finalizeRoute().getMethod() == Method.PATCH;
-    }
-
-    /**
      * Enable/Disable Text-To-Speech for the resulting message.
      * <br>This is only relevant to MessageActions that are not {@code isEdit() == true}!
      *
@@ -155,6 +157,7 @@ public class MessageAction extends RestAction<Message> implements Appendable
      *
      * @return Updated MessageAction for chaining convenience
      */
+    @CheckReturnValue
     public MessageAction tts(final boolean isTTS)
     {
         this.tts = isTTS;
@@ -170,6 +173,7 @@ public class MessageAction extends RestAction<Message> implements Appendable
      *
      * @return Updated MessageAction for chaining convenience
      */
+    @CheckReturnValue
     public MessageAction reset()
     {
         return content(null).nonce(null).embed(null).tts(false).override(false).clearFiles();
@@ -190,6 +194,7 @@ public class MessageAction extends RestAction<Message> implements Appendable
      * @see    net.dv8tion.jda.core.MessageBuilder#setNonce(String)
      * @see    <a href="https://en.wikipedia.org/wiki/Cryptographic_nonce" target="_blank">Cryptographic Nonce - Wikipedia</a>
      */
+    @CheckReturnValue
     public MessageAction nonce(final String nonce)
     {
         this.nonce = nonce;
@@ -209,6 +214,7 @@ public class MessageAction extends RestAction<Message> implements Appendable
      *
      * @return Updated MessageAction for chaining convenience
      */
+    @CheckReturnValue
     public MessageAction content(final String content)
     {
         if (content == null || content.isEmpty())
@@ -236,6 +242,7 @@ public class MessageAction extends RestAction<Message> implements Appendable
      *
      * @return Updated MessageAction for chaining convenience
      */
+    @CheckReturnValue
     public MessageAction embed(final MessageEmbed embed)
     {
         if (embed != null)
@@ -260,6 +267,7 @@ public class MessageAction extends RestAction<Message> implements Appendable
      * @return Updated MessageAction for chaining convenience
      */
     @Override
+    @CheckReturnValue
     public MessageAction append(final CharSequence csq)
     {
         return append(csq, 0, csq.length());
@@ -274,6 +282,7 @@ public class MessageAction extends RestAction<Message> implements Appendable
      * @return Updated MessageAction for chaining convenience
      */
     @Override
+    @CheckReturnValue
     public MessageAction append(final CharSequence csq, final int start, final int end)
     {
         if (content.length() + end - start > Message.MAX_CONTENT_LENGTH)
@@ -291,6 +300,7 @@ public class MessageAction extends RestAction<Message> implements Appendable
      * @return Updated MessageAction for chaining convenience
      */
     @Override
+    @CheckReturnValue
     public MessageAction append(final char c)
     {
         if (content.length() == Message.MAX_CONTENT_LENGTH)
@@ -323,6 +333,7 @@ public class MessageAction extends RestAction<Message> implements Appendable
      *
      * @return Updated MessageAction for chaining convenience
      */
+    @CheckReturnValue
     public MessageAction appendFormat(final String format, final Object... args)
     {
         this.content.append(String.format(format, args));
@@ -352,6 +363,7 @@ public class MessageAction extends RestAction<Message> implements Appendable
      *
      * @return Updated MessageAction for chaining convenience
      */
+    @CheckReturnValue
     public MessageAction addFile(final InputStream data, final String name)
     {
         checkEdit();
@@ -387,6 +399,7 @@ public class MessageAction extends RestAction<Message> implements Appendable
      *
      * @return Updated MessageAction for chaining convenience
      */
+    @CheckReturnValue
     public MessageAction addFile(final byte[] data, final String name)
     {
         checkEdit();
@@ -419,6 +432,7 @@ public class MessageAction extends RestAction<Message> implements Appendable
      *
      * @return Updated MessageAction for chaining convenience
      */
+    @CheckReturnValue
     public MessageAction addFile(final File file)
     {
         Checks.notNull(file, "File");
@@ -449,6 +463,7 @@ public class MessageAction extends RestAction<Message> implements Appendable
      *
      * @return Updated MessageAction for chaining convenience
      */
+    @CheckReturnValue
     public MessageAction addFile(final File file, final String name)
     {
         checkEdit();
@@ -475,6 +490,7 @@ public class MessageAction extends RestAction<Message> implements Appendable
      *
      * @return Updated MessageAction for chaining convenience
      */
+    @CheckReturnValue
     public MessageAction clearFiles()
     {
         files.clear();
@@ -489,6 +505,7 @@ public class MessageAction extends RestAction<Message> implements Appendable
      *
      * @return Updated MessageAction for chaining convenience
      */
+    @CheckReturnValue
     public MessageAction override(final boolean bool)
     {
         this.override = isEdit() && bool;

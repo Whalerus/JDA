@@ -434,8 +434,8 @@ public class MessageBuilder implements Appendable
     public MessageBuilder stripMentions(JDA jda)
     {
         return this.stripMentions(jda, (Guild) null,
-            Message.MentionType.EVERYONE, Message.MentionType.HERE,
-            Message.MentionType.CHANNEL, Message.MentionType.ROLE, Message.MentionType.USER);
+            Message.MentionType.CHANNEL, Message.MentionType.ROLE, Message.MentionType.USER,
+            Message.MentionType.EVERYONE, Message.MentionType.HERE);
     }
 
     /**
@@ -453,8 +453,8 @@ public class MessageBuilder implements Appendable
     public MessageBuilder stripMentions(Guild guild)
     {
         return this.stripMentions(guild.getJDA(), guild,
-            Message.MentionType.EVERYONE, Message.MentionType.HERE,
-            Message.MentionType.CHANNEL, Message.MentionType.ROLE, Message.MentionType.USER);
+            Message.MentionType.CHANNEL, Message.MentionType.ROLE, Message.MentionType.USER,
+            Message.MentionType.EVERYONE, Message.MentionType.HERE);
     }
 
     /**

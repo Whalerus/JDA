@@ -41,22 +41,11 @@ public class MessageReactionBulkRemoveHandler extends SocketHandler
         final long messageId = content.getLong("message_id");
         final long channelId = content.getLong("channel_id");
         MessageChannel channel = api.getTextChannelById(channelId);
-//        if (channel == null) can only bulk remove reactions in a TextChannel
-//        {
-//            channel = api.getPrivateChannelById(channelId);
-//        }
-//        if (channel == null && api.getAccountType() == AccountType.CLIENT)
-//        {
-//            channel = api.asClient().getGroupById(channelId);
-//        }
-//        if (channel == null)
-//        {
-//            channel = api.getFakePrivateChannelMap().get(channelId);
-//        }
         if (channel == null)
         {
             api.getEventCache().cache(EventCache.Type.CHANNEL, channelId, () -> handle(responseNumber, allContent));
-            EventCache.LOG.debug("Received a reaction for a channel that JDA does not currently have cached");
+            EventCache.LOG.debug("Received a reaction for a channel that JDA does not currently have cached " +
+                "channel_id: " + channelId + " message_id: " + messageId);
             return null;
         }
         IEventManager manager = api.getEventManager();

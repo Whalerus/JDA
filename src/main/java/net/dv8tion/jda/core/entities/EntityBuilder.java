@@ -795,49 +795,6 @@ public class EntityBuilder
             reactions = Collections.emptyList();
         }
 
-//        List<User> mentionUsers = null;
-//        if (!jsonObject.isNull("mentions") && chan.getType() == ChannelType.TEXT)
-//        {
-//            JSONArray arr = jsonObject.getJSONArray("mentions");
-//            TreeMap<Integer, User> tree = new TreeMap<>();
-//            for (int i = 0; i < arr.length(); i++)
-//            {
-//                JSONObject obj = arr.getJSONObject(i);
-//                long mentionId = obj.getLong("id");
-//                User u = api.getUserById(mentionId);
-//                if (u != null)
-//                {
-//                    //We do this to properly order the mentions. The array given by discord is out of order sometimes.
-//
-//                    int index = content.indexOf("<@" + mentionId + '>');
-//                    if (index < 0) // nickname mention?
-//                        index = content.indexOf("<@!" + mentionId + '>');
-//                    tree.put(index, u);
-//                }
-//            }
-//            mentionUsers = new ArrayList<>(tree.values());
-//        }
-
-//        List<Role> mentionRoles = null;
-//        if (!jsonObject.isNull("mention_roles") && chan.getType() == ChannelType.TEXT)
-//        {
-//            TextChannel textChannel = (TextChannel) chan;
-//            Guild guild = textChannel.getGuild();
-//            JSONArray arr = jsonObject.getJSONArray("mention_roles");
-//            TreeMap<Integer, Role> tree = new TreeMap<>();
-//            for (int i = 0; i < arr.length(); i++)
-//            {
-//                long roleId = arr.getLong(i);
-//                Role r = guild.getRoleById(roleId);
-//                if (r != null)
-//                {
-//                    int index = content.indexOf("<@&" + roleId + '>');
-//                    tree.put(index, r);
-//                }
-//            }
-//            mentionRoles = new ArrayList<>(tree.values());
-//        }
-
         return new MessageImpl(id, chan, MessageType.DEFAULT,
                 fromWebhook, mentionsEveryone, tts, pinned,
                 content, nonce, user, editTime, reactions, attachments, embeds);

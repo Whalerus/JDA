@@ -41,6 +41,7 @@ public class TextChannelImpl extends AbstractChannelImpl<TextChannelImpl> implem
 {
     private String topic;
     private long lastMessageId;
+    private boolean nsfw;
 
     public TextChannelImpl(long id, GuildImpl guild)
     {
@@ -196,7 +197,7 @@ public class TextChannelImpl extends AbstractChannelImpl<TextChannelImpl> implem
 
     @Override
     public boolean isNSFW() {
-        return name.equals("nsfw") || name.startsWith("nsfw-");
+        return nsfw || name.equals("nsfw") || name.startsWith("nsfw-");
     }
 
     @Override
@@ -446,6 +447,12 @@ public class TextChannelImpl extends AbstractChannelImpl<TextChannelImpl> implem
     public TextChannelImpl setLastMessageId(long id)
     {
         this.lastMessageId = id;
+        return this;
+    }
+
+    public TextChannelImpl setNSFW(boolean nsfw)
+    {
+        this.nsfw = nsfw;
         return this;
     }
 

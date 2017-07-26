@@ -29,6 +29,7 @@ import net.dv8tion.jda.core.utils.MiscUtil;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
+import org.apache.commons.lang3.StringUtils;
 import org.json.JSONObject;
 
 import javax.annotation.CheckReturnValue;
@@ -96,8 +97,9 @@ public class MessageAction extends RestAction<Message> implements Appendable
      */
     public boolean isEmpty()
     {
-        return (content.length() == 0)
-            && (embed == null || embed.getLength() == 0);
+        return StringUtils.isBlank(content)
+            && (!hasPermission(Permission.MESSAGE_EMBED_LINKS)
+                || embed == null || embed.getLength() == 0);
     }
 
     /**
@@ -529,7 +531,7 @@ public class MessageAction extends RestAction<Message> implements Appendable
 
     protected RequestBody asJSON()
     {
-        return RequestBody.create(MediaType.parse("application/json"), getJSON().toString());
+        return RequestBody.create(Requester.MEDIA_TYPE_JSON, getJSON().toString());
     }
 
     protected JSONObject getJSON()
@@ -583,13 +585,17 @@ public class MessageAction extends RestAction<Message> implements Appendable
 
     protected void checkPermission(Permission perm)
     {
-        if (channel.getType() == ChannelType.TEXT)
-        {
-            final TextChannel text = (TextChannel) channel;
-            final Member self = text.getGuild().getSelfMember();
-            if (!self.hasPermission(text, perm))
-                throw new PermissionException(perm);
-        }
+        if (!hasPermission(perm))
+            throw new PermissionException(perm);
+    }
+
+    protected boolean hasPermission(Permission perm)
+    {
+        if (channel.getType() != ChannelType.TEXT)
+            return true;
+        TextChannel text = (TextChannel) channel;
+        Member self = text.getGuild().getSelfMember();
+        return self.hasPermission(text, perm);
     }
 
     @Override

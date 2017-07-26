@@ -35,7 +35,7 @@ public interface MessageEmbed
     int VALUE_MAX_LENGTH = 1024;
     int TEXT_MAX_LENGTH = 2048;
     int URL_MAX_LENGTH = 2000;
-    int EMBED_MAX_LENGTH_BOT = 4000;
+    int EMBED_MAX_LENGTH_BOT = 6000;
     int EMBED_MAX_LENGTH_CLIENT = 2000;
 
     /**

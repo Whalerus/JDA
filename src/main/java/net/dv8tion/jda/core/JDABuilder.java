@@ -64,6 +64,7 @@ public class JDABuilder
     protected boolean enableBulkDeleteSplitting = true;
     protected boolean autoReconnect = true;
     protected boolean idle = false;
+    protected boolean requestTimeoutRetry = true;
 
     /**
      * Creates a completely empty JDABuilder.
@@ -125,6 +126,22 @@ public class JDABuilder
     @Deprecated
     public JDABuilder setWebSocketTimeout(int websocketTimeout)
     {
+        return this;
+    }
+
+    /**
+     * Whether the Requester should retry when
+     * a {@link java.net.SocketTimeoutException SocketTimeoutException} occurs.
+     * <br><b>Default</b>: {@code true}
+     *
+     * <p>This value can be changed at any time with {@link net.dv8tion.jda.core.JDA#setRequestTimeoutRetry(boolean) JDA.setRequestTimeoutRetry(boolean)}!
+     *
+     * @param  retryOnTimeout
+     *         True, if the Request should retry once on a socket timeout
+     */
+    public JDABuilder setRequestTimeoutRetry(boolean retryOnTimeout)
+    {
+        this.requestTimeoutRetry = retryOnTimeout;
         return this;
     }
 
@@ -505,7 +522,7 @@ public class JDABuilder
         OkHttpClient.Builder httpClientBuilder = this.httpClientBuilder == null ? new OkHttpClient.Builder() : this.httpClientBuilder;
         WebSocketFactory wsFactory = this.wsFactory == null ? new WebSocketFactory() : this.wsFactory;
         JDAImpl jda = new JDAImpl(accountType, httpClientBuilder, wsFactory, autoReconnect, enableVoice, enableShutdownHook,
-                enableBulkDeleteSplitting, corePoolSize, maxReconnectDelay);
+                enableBulkDeleteSplitting, requestTimeoutRetry, corePoolSize, maxReconnectDelay);
 
         if (eventManager != null)
             jda.setEventManager(eventManager);

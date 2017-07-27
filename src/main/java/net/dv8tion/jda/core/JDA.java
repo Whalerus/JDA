@@ -23,9 +23,10 @@ import net.dv8tion.jda.core.hooks.IEventManager;
 import net.dv8tion.jda.core.managers.Presence;
 import net.dv8tion.jda.core.requests.RestAction;
 import net.dv8tion.jda.core.requests.restaction.AuditableRestAction;
+
+import javax.annotation.CheckReturnValue;
 import java.util.Collection;
 import java.util.List;
-import javax.annotation.CheckReturnValue;
 
 /**
  * The core of JDA. Acts as a registry system of JDA. All parts of the the API can be accessed starting from this class.
@@ -715,6 +716,15 @@ public interface JDA
      * @param  reconnect If true - enables autoReconnect
      */
     void setAutoReconnect(boolean reconnect);
+
+    /**
+     * Whether the Requester should retry when
+     * a {@link java.net.SocketTimeoutException SocketTimeoutException} occurs.
+     *
+     * @param  retryOnTimeout
+     *         True, if the Request should retry once on a socket timeout
+     */
+    void setRequestTimeoutRetry(boolean retryOnTimeout);
 
     /**
      * USed to determine whether or not autoReconnect is enabled for JDA.
